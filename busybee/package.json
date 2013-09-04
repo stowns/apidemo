@@ -1,0 +1,33 @@
+{
+  "name": "busybee",
+  "description": "starting point for applications in a hive",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Chris Rogers, Simon Townsend <stowns3@gmail.com",
+  "main": "./lib/main.js",
+  "dependencies": {
+    "lodash": "1.x",
+    "q": "~0.8",
+    "winston": "~0.6",
+    "js-yaml": "~2",
+    "nconf": "~0.6",
+    "hiredis": "~0.1.15",
+    "redis": "~0.8.4",
+    "zmq": "~2.3",
+    "protobuf": "~0.8",
+    "node-uuid": "~1.4",
+    "node-cache": "~0.3"
+  },
+  "devDependencies": {
+    "mocha": "1.x",
+    "should": "1.x",
+    "wrench": "~1.4",
+    "docker": "~0.2.7",
+    "jscoverage": "~0.3.6",
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.3.0"
+  },
+  "engines": {
+    "node": ">=0.8"
+  }
+}
