@@ -22,8 +22,6 @@ Locator = module.exports = function() {
 Locator.prototype.__proto__ = events.EventEmitter.prototype;
 
 Locator.prototype.start = _.once(function() {
-  console.log('SHITS STARTED');
-
   var _this = this;
 
   /* fetch current service list */
@@ -56,8 +54,6 @@ Locator.prototype.start = _.once(function() {
  * @param {String} name of a service
  */
 Locator.prototype.service = function(serviceName) {
-  console.log('services');
-  console.log(this.services);
   var s = this.services[serviceName].shift();
   // move the returned service to the back of the stack (fair-que)
   this.services[serviceName].push(s);
@@ -77,8 +73,6 @@ Locator.prototype.register = function(serviceName, address) {
         .smembers("services")
         .exec(function(err, reply) {
           // publish new list to redis
-          console.log("reply");
-          console.log(reply);
           client.publish("service-update", JSON.stringify(reply[1]));
         });
 }
@@ -96,8 +90,6 @@ Locator.prototype.deregister = function(serviceName, address) {
         .smembers("services")
         .exec(function(err, reply) {
           // publish new list to redis
-          console.log("reply");
-          console.log(reply);
           client.publish("service-update", JSON.stringify(reply[1]));
         });
 }
@@ -122,8 +114,5 @@ function parseServiceList(serviceList) {
                            : services[service[0]].push(service[1]);
   });
 
-  console.log('parsed');
-  console.log(services);
-  
   return services;
 }

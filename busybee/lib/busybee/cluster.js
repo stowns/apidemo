@@ -30,26 +30,53 @@ Cluster.prototype.start = _.once(function () {
 
   var cluster = this;
 
-  // calls master() method w/ a cb
+
+  /** calls master() method w/ a cb */
   this.master(function () {
-    // intialize broker if applicable
-    
-    // Default number of workers is the number of CPUs
+    console.log('Master process id ' + process.pid.toString());
+
+    /** Default number of workers is the number of CPUs */
     var cpus        = require('os').cpus().length,
         numWorkers  = cluster.numWorkers || cpus;
+    
+    /** explicitly set worker number */
+    cluster.workers(numWorkers);
 
     console.log('cluster: Spawning ' + numWorkers
               + ' workers for ' + cpus + ' CPUs');
 
-    _.times(numWorkers, cluster.sysCluster.fork);
-
-    // Restart workers when they die
+    /** Restart workers when they die */
     cluster.sysCluster.on('exit', cluster.restartWorker);
 
+    cluster.sysCluster.on('fork', function(worker) {
+      console.log("worker " + worker.process.pid + " (#"+worker.id+") has spawned");
+    });
+
+    _.times(numWorkers, cluster.sysCluster.fork);
+  });
+
+  process.on('SIGUSR2', function(){  
+    console.log("Signal: SIGUSR2");   
+    console.log("swap out new workers one-by-one");   
+    cluster.workerRestartArray = []; 
+    
+    for(var i in cluster.sysCluster.workers){    
+      cluster.workerRestartArray.push(cluster.sysCluster.workers[i]);  
+    }
+   
+    cluster.restartWorker();
+  });
+
+  this.worker(function() {
+    process.on('message', function(msg) {
+      if(msg == "stop"){
+        process.send("stopping");
+        process.exit();
+      }
+    });
   });
 
   return this;
-
 });
 
 /**
@@ -61,18 +88,34 @@ Cluster.prototype.start = _.once(function () {
  * @param {String} signal The signal that killed the worker
  */
 Cluster.prototype.restartWorker = function (worker, code, signal) {
-
+  console.log('restartWorker called');
   var cluster = this;
 
-  _.delay(function () {
+  var workersRunning = 0;
+  for (var i in cluster.sysCluster.workers){ workersRunning++; }
 
-    console.log('cluster: Worker ' + worker.id + ' (pid '
-             + worker.process.pid + ') ' + 'died ('
-             + worker.process.exitCode + '). Respawning..');
+  console.log('numWorkers: ' + cluster.numWorkers);
+  console.log('workersRunning: ' + workersRunning);
+  if ( cluster.numWorkers > workersRunning ) {
+    /* delayed to prevent CPU explosions if crashes happen to quickly */
+    _.delay(function () {
 
-    cluster.sysCluster.fork();
+      console.log('cluster: Worker ' + worker.id + ' (pid '
+               + worker.process.pid + ') ' + 'died ('
+               + worker.process.exitCode + '). Respawning..');
 
-  }, 10);
+      cluster.sysCluster.fork();
+
+    }, 100);
+  } 
+
+  console.log('workerRestartArray: ' + cluster.workerRestartArray);
+  /* used for rolling restarts (SIGUSR2) */
+  if (cluster.workerRestartArray.length > 0) {
+    var worker = cluster.workerRestartArray.pop();
+    // killing a worker will inturn call restartWorker and restart itself.
+    worker.send("stop");
+  }
 
 };
 
@@ -127,4 +170,4 @@ Cluster.prototype.shared = function (cb) {
 
   return this;
 
-};
+}; 
