@@ -10,8 +10,7 @@ var versions = require('./lib/versions'),
     async    = require('async'),
     restify  = require('restify');
 
-var busybee  = global.busybee = require('busybee');
-global.locator = new busybee.locator;
+var busybee  = require('busybee');
 busybee.init({ name : 'api' });
 
 /** dependencies */
@@ -26,12 +25,12 @@ server = restify.createServer({
 });
 
 server.pre([
-  restify.queryParser(),
-  restify.bodyParser(),
   restify.authorizationParser(),
 ]);
 
 server.use([
+  restify.queryParser(),
+  restify.bodyParser(),
   restify.acceptParser(server.acceptable),
   restify.throttle({
     rate:     conf.server.throttleRate,
