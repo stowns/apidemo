@@ -11,7 +11,7 @@ var versions = require('./lib/versions'),
     restify  = require('restify');
 
 var busybee  = require('busybee');
-busybee.init({ name : 'api' });
+busybee.init({ name : 'api', conf : '/etc/busybee/api' });
 
 /** dependencies */
 var conf    = busybee.conf,

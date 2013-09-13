@@ -2,7 +2,6 @@ var zmq = require('zmq'),
     _   = require('lodash'),
     busybee = require('busybee');
 
-
 busybee.init({ name : 'service_1' });
 
 /** busybee dependent */
