@@ -13,15 +13,18 @@ new busybee.cluster(conf)
     /** register the service */
     busybee.locator.register(conf.app.name, conf.sockets.service);
 
-    var conn = new busybee.brokerConnection(conf.sockets.broker.front, conf.sockets.broker.back, conf.app.name);
+    var conn = new busybee.connection.broker(conf.sockets.broker.front, conf.sockets.broker.back, conf.app.name);
    })
   .worker(function () {
-    var conn = new busybee.workerConnection(conf.sockets.worker);
+    var reqHandler = function(err, req) {
+      if (err) return log.error(err);
+      log.info('msg recieved: ' + req);
 
-    conn.responder.on('message', function(msg) {
-      log.info('msg recieved: ' + msg);
       var res = new Object();
-      res.data = 'data from service_1 on process: ' + process.pid + ' (node) with payload ' + msg;
-      conn.responder.send(JSON.stringify(res));
-    });
+      res.data = 'service_1 data on process: ' + process.pid + ' (node) with payload ' + req;
+
+      return res;
+    }
+
+    var conn = new busybee.connection.worker(conf.sockets.worker, reqHandler);
   });

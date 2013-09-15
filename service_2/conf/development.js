@@ -3,12 +3,12 @@ module.exports = {
     name: 'service_2'
   },
   sockets: {
-    service: 'tcp://localhost:5561',
+    service: 'tcp://localhost:5563',
     broker: {
-      front: 'tcp://*:5561',
-      back: 'tcp://*:5562'
+      front: 'tcp://*:5563',
+      back: 'tcp://*:5564'
     },
-    worker: 'tcp://localhost:5562'
+    worker: 'tcp://localhost:5564'
   },
   store: {
     mongo: 'mongodb://localhost/service_2',

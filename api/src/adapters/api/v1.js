@@ -21,7 +21,9 @@ function call(req, res, next) {
   var calls = _.map(services, function(service) {
 
     return function(cb) {
-      new busybee.clientConnection(req.query.payload, service, cb);
+      new busybee.connection.req({ payload : req.query.payload, 
+                                   name : service.name,
+                                   timeout : service.timeout}, cb);
     }
 
   });
@@ -29,7 +31,7 @@ function call(req, res, next) {
   async.parallel(calls, function(err, results) {
     if (err) return res.send(err);
 
-    res.send(_.map(results, function(value) { return JSON.parse(value).data }));
+    res.send(_.map(results, function(value) { return value.data }));
     next();
   });
   
