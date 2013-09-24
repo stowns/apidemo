@@ -16,7 +16,7 @@ var conf = busybee.conf,
 new busybee.cluster(conf)
   .master(function () {
     /** register the service */
-    busybee.locator.register('test', 'tcp://localhost:5563');
+    busybee.locator.register('test', conf.sockets.service);
     
     var reqHandler = function(err, req) {
       if (err) return log.error(err);
@@ -28,7 +28,7 @@ new busybee.cluster(conf)
       return res;
     }
 
-    var conn = new busybee.connection.rep('tcp://*:5563', reqHandler);
+    var conn = new busybee.connection.rep(conf.sockets.bind, reqHandler);
    })
   .worker(function () {
     _.delay(function() {

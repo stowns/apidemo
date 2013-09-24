@@ -1,13 +1,13 @@
 module.exports = {
   app: {
-    name : 'test'
+    name : 'push_pull'
   },
   sockets: {
-    service : 'tcp://localhost:5561',
-    bind : 'tcp://*:5563'
+    push : 'tcp://*:5561',
+    pull : 'tcp://localhost:5561'
   },
   store: {
-    mongo: 'mongodb://localhost/service_1',
+    mongo: 'mongodb://localhost/push_pull',
     redis: 'redis://localhost:6379'
   },
   logger: {
